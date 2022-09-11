@@ -4,17 +4,21 @@ let canvasWidth;
 let canvasHeight;
 let ballPosition;
 const ballRadius = 10;
+let ballSpeed = 10;
 let ballDir;
 let playerPosition;
 let opponentPosition;
 const blockHeight = 80;
 const blockWidth = 15;
+let playerWins = 0;
+let botWins = 0;
 
 window.onload = function () {
     canvas = document.getElementById("gameWindow");
     canvasContext = canvas.getContext("2d");
     canvasContext.canvas.width = window.innerWidth - 20;
     canvasContext.canvas.height = window.innerHeight - 20;
+    canvasContext.font = "20pt Arial";
     canvasWidth = canvas.width;
     canvasHeight = canvas.height;
 
@@ -23,49 +27,62 @@ window.onload = function () {
     canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
 
 
+    startGame()
+}
+
+function startGame() {
     drawPlayer(15, canvasHeight / 2 - blockHeight / 2);
 
     drawOpponent(canvasWidth - 15 - blockWidth, canvasHeight / 2 - blockHeight / 2);
 
     canvas.addEventListener("mousemove", getMouseHeight);
-    ballDir = Math.floor(Math.random() * 360);
+    ballDir = Math.floor(Math.random() * 360) * Math.PI / 180;
 
     drawBall(canvasWidth / 2, canvasHeight / 2);
     play();
 }
-let i = 100;
 
 function play(playerY) {
 
-    drawBall(i, i);
-    //i+=1;
+    moveBall();
+
     // move player
     drawPlayer(playerPosition.x, playerY);
     // move opponent
 
-    moveOpponent(Math.floor(Math.random() * 3)-1);
-    // check if ball hit borders
+    moveOpponent(Math.floor(Math.random() * 3) - 1);
+}
 
-    // redirect the ball if needed
-
-    /*
-    TODO:
-    1. throw ball at random direction at start
-    2. match left rectangle to mouse's height
-    3. physics - to bounce the ball from top and bottom borders and players
-    4. in case the ball reaches the left or right borders - game over
-     */
+function moveBall() {
+    if (ballPosition.y - ballRadius < 1 || ballPosition.y + ballRadius > canvasHeight - 1) {
+        ballDir *= -1;
+    } else if (ballPosition.x - ballRadius < 1 || ballPosition.x + ballRadius > canvasWidth) {
+        (ballPosition.x - ballRadius < 1) ? botWins += 1 : playerWins += 1;
+        startGame();
+    } else if (ballPosition.x - ballRadius - playerPosition.x - blockWidth < 0.5 &&
+        ballPosition.y - playerPosition.y < blockHeight + ballRadius &&
+        ballPosition.y - playerPosition.y > -ballRadius) {
+        // Bug in this conditions
+        let m = (ballPosition.y - (playerPosition.y + blockHeight/2)) / (ballPosition.x - (playerPosition.x + blockWidth / 2));
+        ballDir = Math.atan(m);
+    } else if (opponentPosition.x - ballPosition.x - ballRadius < 0.5 &&
+        ballPosition.y - opponentPosition.y < blockHeight + ballRadius &&
+        ballPosition.y - opponentPosition.y > -ballRadius) {
+        let m = ((opponentPosition.y + blockHeight / 2) - ballPosition.y) / ((opponentPosition.x + blockWidth / 2) - ballPosition.x);
+        ballDir = Math.atan(m) + Math.PI;
+    }
+    drawBall(ballPosition.x + ballSpeed * Math.cos(ballDir), ballPosition.y + ballSpeed * Math.sin(ballDir));
 }
 
 function moveOpponent(y) {
-    //add some more logic for simple AI
-    drawOpponent(opponentPosition.x, opponentPosition.y + y);
+    if (ballPosition.y < opponentPosition.y + blockHeight / 2) drawOpponent(opponentPosition.x, opponentPosition.y + y - 2);
+    else drawOpponent(opponentPosition.x, opponentPosition.y + y + Math.floor(canvasHeight/200));
 }
 
 function drawBall(x, y) {
     if (typeof ballPosition !== 'undefined') {
         canvasContext.fillStyle = "green";
-        canvasContext.fillRect(ballPosition.x - ballRadius, ballPosition.y - ballRadius, 2 * ballRadius, 2 * ballRadius);
+        canvasContext.fillRect(ballPosition.x - ballRadius - 1, ballPosition.y - ballRadius - 1, 2 * ballRadius + 2, 2 * ballRadius + 2);
     } else {
         canvasContext.fillStyle = "green";
         canvasContext.fillRect(canvas.width / 2 - ballRadius, canvas.height / 2 - ballRadius, 2 * ballRadius, 2 * ballRadius);
@@ -107,12 +124,13 @@ function drawOpponent(x, y) {
     canvasContext.fill();
 }
 
-
 function drawRectangle(x, y) {
     canvasContext.fillRect(x, y, blockWidth, blockHeight);
 }
 
 function getMouseHeight(event) {
-    //console.log(event.clientY - (canvas.offsetTop - window.pageYOffset));
+    canvasContext.fillStyle = "green";
+    canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
     play(event.clientY - (canvas.offsetTop - window.pageYOffset));
+    canvasContext.fillText( "     Player: " + playerWins + ", Opponent: " + botWins, 20, 20);
 }
