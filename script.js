@@ -58,7 +58,7 @@ function play(playerY) {
 }
 
 function moveOpponent(y) {
-    console.log(opponentPosition.y + y);
+    //add some more logic for simple AI
     drawOpponent(opponentPosition.x, opponentPosition.y + y);
 }
 
