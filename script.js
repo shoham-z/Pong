@@ -8,6 +8,7 @@ let ballSpeed = 10;
 let ballDir;
 let playerPosition;
 let opponentPosition;
+let opponentStep = 5;
 const blockHeight = 80;
 const blockWidth = 15;
 let playerWins = 0;
@@ -50,7 +51,7 @@ function play(playerY) {
     drawPlayer(playerPosition.x, playerY);
     // move opponent
 
-    moveOpponent(Math.floor(Math.random() * 3) - 1);
+    moveOpponent();
 }
 
 function moveBall() {
@@ -63,7 +64,7 @@ function moveBall() {
         ballPosition.y - playerPosition.y < blockHeight + ballRadius &&
         ballPosition.y - playerPosition.y > -ballRadius) {
         // Bug in this conditions
-        let m = (ballPosition.y - (playerPosition.y + blockHeight/2)) / (ballPosition.x - (playerPosition.x + blockWidth / 2));
+        let m = (ballPosition.y - (playerPosition.y + blockHeight / 2)) / (ballPosition.x - (playerPosition.x + blockWidth / 2));
         ballDir = Math.atan(m);
     } else if (opponentPosition.x - ballPosition.x - ballRadius < 0.5 &&
         ballPosition.y - opponentPosition.y < blockHeight + ballRadius &&
@@ -74,9 +75,9 @@ function moveBall() {
     drawBall(ballPosition.x + ballSpeed * Math.cos(ballDir), ballPosition.y + ballSpeed * Math.sin(ballDir));
 }
 
-function moveOpponent(y) {
-    if (ballPosition.y < opponentPosition.y + blockHeight / 2) drawOpponent(opponentPosition.x, opponentPosition.y + y - 2);
-    else drawOpponent(opponentPosition.x, opponentPosition.y + y + Math.floor(canvasHeight/200));
+function moveOpponent() {
+    if (ballPosition.y < opponentPosition.y + blockHeight / 2) drawOpponent(opponentPosition.x, opponentPosition.y - opponentStep);
+    else drawOpponent(opponentPosition.x, opponentPosition.y + opponentStep);
 }
 
 function drawBall(x, y) {
@@ -132,5 +133,5 @@ function getMouseHeight(event) {
     canvasContext.fillStyle = "green";
     canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
     play(event.clientY - (canvas.offsetTop - window.pageYOffset));
-    canvasContext.fillText( "     Player: " + playerWins + ", Opponent: " + botWins, 20, 20);
+    canvasContext.fillText("     Player: " + playerWins + ", Opponent: " + botWins, 20, 20);
 }
