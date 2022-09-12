@@ -1,10 +1,8 @@
 let canvas;
 let canvasContext;
-let canvasWidth;
-let canvasHeight;
 let ballPosition;
 const ballRadius = 10;
-let ballSpeed = 10;
+const ballSpeed = 2;
 let ballDir;
 let playerPosition;
 let opponentPosition;
@@ -20,26 +18,24 @@ window.onload = function () {
     canvasContext.canvas.width = window.innerWidth - 20;
     canvasContext.canvas.height = window.innerHeight - 20;
     canvasContext.font = "20pt Arial";
-    canvasWidth = canvas.width;
-    canvasHeight = canvas.height;
 
     canvasContext.fillStyle = "green";
     //draw background / rect on entire canvas
-    canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
+    canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 
 
     startGame()
 }
 
 function startGame() {
-    drawPlayer(15, canvasHeight / 2 - blockHeight / 2);
+    drawPlayer(15, canvas.height / 2 - blockHeight / 2);
 
-    drawOpponent(canvasWidth - 15 - blockWidth, canvasHeight / 2 - blockHeight / 2);
+    drawOpponent(canvas.width - 15 - blockWidth, canvas.height / 2 - blockHeight / 2);
 
     canvas.addEventListener("mousemove", getMouseHeight);
     ballDir = Math.floor(Math.random() * 360) * Math.PI / 180;
 
-    drawBall(canvasWidth / 2, canvasHeight / 2);
+    drawBall(canvas.width / 2, canvas.height / 2);
     play();
 }
 
@@ -55,16 +51,20 @@ function play(playerY) {
 }
 
 function moveBall() {
-    if (ballPosition.y - ballRadius < 1 || ballPosition.y + ballRadius > canvasHeight - 1) {
+    console.log(ballPosition.y - playerPosition.y);
+    console.log(-blockHeight/2 - ballRadius/2);
+    console.log(playerPosition.y);
+    console.log("skip");
+    if (ballPosition.y - ballRadius < 1 || ballPosition.y + ballRadius > canvas.height - 1) {
         ballDir *= -1;
-    } else if (ballPosition.x - ballRadius < 1 || ballPosition.x + ballRadius > canvasWidth) {
+    } else if (ballPosition.x - ballRadius < 1 || ballPosition.x + ballRadius > canvas.width) {
         (ballPosition.x - ballRadius < 1) ? botWins += 1 : playerWins += 1;
         startGame();
     } else if (ballPosition.x - ballRadius - playerPosition.x - blockWidth < 0.5 &&
-        ballPosition.y - playerPosition.y < blockHeight + ballRadius &&
-        ballPosition.y - playerPosition.y > -ballRadius) {
+        ballPosition.y - playerPosition.y < blockHeight/2 + ballRadius/2 &&
+        ballPosition.y - playerPosition.y > -blockHeight/2 - ballRadius/2) {
         // Bug in this conditions
-        let m = (ballPosition.y - (playerPosition.y + blockHeight / 2)) / (ballPosition.x - (playerPosition.x + blockWidth / 2));
+        let m = (ballPosition.y - playerPosition.y) / (ballPosition.x - (playerPosition.x + blockWidth / 2));
         ballDir = Math.atan(m);
     } else if (opponentPosition.x - ballPosition.x - ballRadius < 0.5 &&
         ballPosition.y - opponentPosition.y < blockHeight + ballRadius &&
@@ -115,7 +115,7 @@ function drawOpponent(x, y) {
     if (typeof opponentPosition !== 'undefined') {
         canvasContext.fillRect(opponentPosition.x, opponentPosition.y, blockWidth, blockHeight);
     } else {
-        canvasContext.fillRect(canvasWidth - 15 - blockWidth, canvas.height / 2 - blockHeight / 2, blockWidth, blockHeight);
+        canvasContext.fillRect(canvas.width - 15 - blockWidth, canvas.height / 2 - blockHeight / 2, blockWidth, blockHeight);
     }
 
     canvasContext.fillStyle = "red";
@@ -131,7 +131,7 @@ function drawRectangle(x, y) {
 
 function getMouseHeight(event) {
     canvasContext.fillStyle = "green";
-    canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
+    canvasContext.fillRect(0, 0, canvas.width, canvas.height);
     play(event.clientY - (canvas.offsetTop - window.pageYOffset));
     canvasContext.fillText("     Player: " + playerWins + ", Opponent: " + botWins, 20, 20);
 }
