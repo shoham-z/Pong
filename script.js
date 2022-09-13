@@ -40,13 +40,16 @@ function startGame() {
     canvas.addEventListener("mousemove", getMouseHeight);
 
     //throw the ball in random direction
-    ballDir = Math.floor(Math.random() * 360) * Math.PI / 180;
+    ballDir = rand(-60,60) * Math.PI / 180 + Math.PI * rand(0,1);
 
     drawBall(canvas.width / 2, canvas.height / 2);
 }
 
-function play(playerY) {
+function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
+function play(playerY) {
     moveBall();
 
     // move player
