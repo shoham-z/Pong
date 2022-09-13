@@ -3,7 +3,9 @@ let canvasContext;
 let ballPosition;
 const ballRadius = 10;
 let ballDir;
+// this variable is set to the middle of the player block
 let playerPosition;
+// this variable is set to top left of the bot block
 let opponentPosition;
 const blockHeight = 80;
 const blockWidth = 15;
