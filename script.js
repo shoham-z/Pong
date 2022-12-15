@@ -29,6 +29,15 @@ window.onload = function () {
     //draw background on entire canvas
     canvasContext.fillRect(0, 0, canvas.width, canvas.height);
 
+    if (ms < 20) {
+        ballSpeed = ballSpeed / 2;
+    }
+    if (canvas.width > 1366) {
+        ballSpeed = ballSpeed * 1.75;
+    }
+
+    //adds the driver function to the game
+    setInterval(play, ms);
 
     startGame()
 }
@@ -39,11 +48,7 @@ function startGame() {
 
     drawOpponent(canvas.width - 15 - blockWidth, canvas.height / 2 - blockHeight / 2);
 
-    //adds the driver function to the game
-    setInterval(play, ms);
-    if (ms < 20) {
-        ballSpeed = ballSpeed / 2;
-    }
+    console.log("delay " + ms + ", ball speed " + ballSpeed);
 
     canvas.addEventListener("mousemove", getMouseHeight);
 
